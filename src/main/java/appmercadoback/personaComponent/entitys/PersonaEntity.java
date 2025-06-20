@@ -1,5 +1,5 @@
 package appmercadoback.personaComponent.entitys;
-import appmercadoback.productoComponent.entitys.ImageEntity;
+import appmercadoback.productoComponent.entitys.Image;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,5 +24,5 @@ public class PersonaEntity {
 
     @OneToOne
     @JoinColumn(name = "imagen_id")
-    private ImageEntity imagen;
+    private Image imagen;
 }

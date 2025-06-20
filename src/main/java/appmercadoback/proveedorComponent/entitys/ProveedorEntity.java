@@ -27,4 +27,6 @@ public class ProveedorEntity {
     @JoinColumn(name = "persona_id", nullable = false)
     private PersonaEntity persona;
 
+    @ManyToMany(mappedBy = "proveedores")
+    private List<ProductoEntity> productos;
 }

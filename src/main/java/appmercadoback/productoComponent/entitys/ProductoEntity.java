@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "producto")
@@ -44,9 +45,14 @@ public class ProductoEntity {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id", referencedColumnName = "id")
-    private ImageEntity image;
+    private Image image;
 
-    @ManyToOne
-    @JoinColumn(name = "proveedor_id")
-    private ProveedorEntity proveedor;
+    @ManyToMany
+    @JoinTable(
+            name = "producto_proveedor",
+            joinColumns = @JoinColumn(name = "producto_id"),
+            inverseJoinColumns = @JoinColumn(name = "proveedor_id")
+    )
+    private List<ProveedorEntity> proveedores;
+
 }

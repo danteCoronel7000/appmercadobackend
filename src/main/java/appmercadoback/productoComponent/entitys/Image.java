@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "imagen")
-public class ImageEntity {
+public class Image {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +24,7 @@ public class ImageEntity {
 
     private String imageId;
 
-    public ImageEntity(String name, String imageUrl, String imageId) {
+    public Image(String name, String imageUrl, String imageId) {
         this.name = name;
         this.imageUrl = imageUrl;
         this.imageId = imageId;

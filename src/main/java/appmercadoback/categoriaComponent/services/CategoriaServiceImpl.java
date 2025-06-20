@@ -18,10 +18,6 @@ public class CategoriaServiceImpl implements CategoriaService{
 
     @Override
     public CategoriaEntity guardarCategoria(CategoriaEntity categoria) {
-        System.out.println("⏳ Guardando categoría: " + categoria.getNombre());
-        Arrays.stream(Thread.currentThread().getStackTrace())
-                .forEach(s -> System.out.println("  at " + s));
-
         categoria.setProductos(new ArrayList<>()); // o new ArrayList<>()
         return categoriaRepository.save(categoria);
     }

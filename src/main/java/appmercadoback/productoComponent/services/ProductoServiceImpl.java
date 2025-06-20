@@ -1,10 +1,14 @@
 package appmercadoback.productoComponent.services;
 
 import appmercadoback.productoComponent.entitys.ProductoEntity;
+import appmercadoback.productoComponent.entitys.Image;
 import appmercadoback.productoComponent.repositorys.ProductoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.*;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +17,7 @@ import java.util.Optional;
 public class ProductoServiceImpl implements ProductoService{
 
     private final ProductoRepository productoRepository;
+    private ImageService imageService;
 
     @Override
     public ProductoEntity guardarProducto(ProductoEntity producto) {
@@ -55,5 +60,48 @@ public class ProductoServiceImpl implements ProductoService{
             throw new RuntimeException("Producto no encontrado con ID: " + id);
         }
         productoRepository.deleteById(id);
+    }
+
+    //metodos para la gestion de productos con imagenes en la nube (cloudInary)
+    @Override
+    public ProductoEntity saveProducto(ProductoEntity producto, MultipartFile file) throws IOException {
+        if (file != null && !file.isEmpty()) {
+            Image image = imageService.uploadImage(file);
+            producto.setImage(image);
+        }
+        return productoRepository.save(producto);
+    }
+
+    @Override
+    public ProductoEntity updateProducto(ProductoEntity producto) {
+        return productoRepository.save(producto);
+    }
+
+    @Override
+    public List<ProductoEntity> getProductos() {
+        return productoRepository.findAll();
+    }
+
+    @Override
+    public Optional<ProductoEntity> getProductoById(Integer id) {
+        return productoRepository.findById(id);
+    }
+
+    @Override
+    public void deleteProducto(ProductoEntity producto) throws IOException {
+        if (producto.getImage() != null) {
+            imageService.deleteImage(producto.getImage());
+        }
+        productoRepository.deleteById(producto.getId());
+    }
+
+    @Override
+    public ProductoEntity updateProductoImage(MultipartFile file, ProductoEntity producto) throws IOException {
+        if (producto.getImage() != null) {
+            imageService.deleteImage(producto.getImage());
+        }
+        Image newImage = imageService.uploadImage(file);
+        producto.setImage(newImage);
+        return productoRepository.save(producto);
     }
 }
