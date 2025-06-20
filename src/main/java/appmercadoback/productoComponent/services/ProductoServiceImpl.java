@@ -1,9 +1,12 @@
 package appmercadoback.productoComponent.services;
 
+import appmercadoback.categoriaComponent.entitys.CategoriaEntity;
+import appmercadoback.categoriaComponent.repository.CategoriaRepository;
 import appmercadoback.productoComponent.entitys.ProductoEntity;
 import appmercadoback.productoComponent.entitys.Image;
 import appmercadoback.productoComponent.repositorys.ProductoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +20,8 @@ import java.util.Optional;
 public class ProductoServiceImpl implements ProductoService{
 
     private final ProductoRepository productoRepository;
+    private final CategoriaRepository categoriaRepository;
+    @Autowired
     private ImageService imageService;
 
     @Override
@@ -65,12 +70,24 @@ public class ProductoServiceImpl implements ProductoService{
     //metodos para la gestion de productos con imagenes en la nube (cloudInary)
     @Override
     public ProductoEntity saveProducto(ProductoEntity producto, MultipartFile file) throws IOException {
+        // 👇 Validar y buscar la categoría por su ID
+        if (producto.getCategoria() != null && producto.getCategoria().getId() != null) {
+            CategoriaEntity categoria = categoriaRepository.findById(producto.getCategoria().getId())
+                    .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + producto.getCategoria().getId()));
+            producto.setCategoria(categoria);
+        } else {
+            throw new RuntimeException("Se debe proporcionar el id de la categoría");
+        }
+
+        // 👇 Si hay archivo, procesar la imagen
         if (file != null && !file.isEmpty()) {
             Image image = imageService.uploadImage(file);
             producto.setImage(image);
         }
+
         return productoRepository.save(producto);
     }
+
 
     @Override
     public ProductoEntity updateProducto(ProductoEntity producto) {

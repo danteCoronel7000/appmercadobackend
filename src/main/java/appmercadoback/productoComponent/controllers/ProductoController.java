@@ -65,14 +65,16 @@ public class ProductoController {
     @PostMapping("save")
     public ResponseEntity<ProductoEntity> saveProducto(
             @RequestPart("producto") ProductoEntity producto,
-            @RequestPart("file") MultipartFile file) {
+            @RequestPart(value = "file", required = false) MultipartFile file) {
         try {
             ProductoEntity savedProducto = productoService.saveProducto(producto, file);
             return new ResponseEntity<>(savedProducto, HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace(); // 👈 MOSTRÁ EL ERROR EN CONSOLA
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
 
     // Actualizar solo la imagen de un producto
     @PutMapping("/{id}/image")

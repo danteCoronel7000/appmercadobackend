@@ -3,6 +3,7 @@ package appmercadoback.productoComponent.entitys;
 
 import appmercadoback.categoriaComponent.entitys.CategoriaEntity;
 import appmercadoback.proveedorComponent.entitys.ProveedorEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,7 +41,8 @@ public class ProductoEntity {
     private String etiquetas;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categoria_id", nullable = false)
+    @JoinColumn(name = "categoria_id")
+    @JsonBackReference
     private CategoriaEntity categoria;
 
     @OneToOne(cascade = CascadeType.ALL)
