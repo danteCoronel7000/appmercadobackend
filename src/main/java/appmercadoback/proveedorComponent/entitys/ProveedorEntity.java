@@ -3,6 +3,7 @@ package appmercadoback.proveedorComponent.entitys;
 
 import appmercadoback.personaComponent.entitys.PersonaEntity;
 import appmercadoback.productoComponent.entitys.ProductoEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,5 +29,6 @@ public class ProveedorEntity {
     private PersonaEntity persona;
 
     @ManyToMany(mappedBy = "proveedores")
+    @JsonBackReference
     private List<ProductoEntity> productos;
 }

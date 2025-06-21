@@ -74,6 +74,19 @@ public class ProductoController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+    // Guardar un producto con imagen
+    @PutMapping("update")
+    public ResponseEntity<ProductoEntity> updateProductoAndImage(
+            @RequestPart("producto") ProductoEntity producto,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+        try {
+            ProductoEntity savedProducto = productoService.updateProductoAndImage(producto, file);
+            return new ResponseEntity<>(savedProducto, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace(); // 👈 MOSTRÁ EL ERROR EN CONSOLA
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
 
 
     // Actualizar solo la imagen de un producto

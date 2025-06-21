@@ -4,6 +4,8 @@ package appmercadoback.productoComponent.entitys;
 import appmercadoback.categoriaComponent.entitys.CategoriaEntity;
 import appmercadoback.proveedorComponent.entitys.ProveedorEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,9 +42,9 @@ public class ProductoEntity {
 
     private String etiquetas;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "categoria_id")
-    @JsonBackReference
+    @JsonIgnoreProperties({"productos"})
     private CategoriaEntity categoria;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -55,6 +57,7 @@ public class ProductoEntity {
             joinColumns = @JoinColumn(name = "producto_id"),
             inverseJoinColumns = @JoinColumn(name = "proveedor_id")
     )
+    @JsonIgnoreProperties({"productos"}) // Si ProveedorEntity también tiene referencia a productos
     private List<ProveedorEntity> proveedores;
 
 }

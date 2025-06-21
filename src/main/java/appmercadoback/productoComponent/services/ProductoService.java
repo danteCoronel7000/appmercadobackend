@@ -22,6 +22,8 @@ public interface ProductoService {
 
     ProductoEntity saveProducto(ProductoEntity producto, MultipartFile file) throws IOException;
 
+    ProductoEntity updateProductoAndImage(ProductoEntity producto, MultipartFile file) throws IOException;
+
     ProductoEntity updateProducto(ProductoEntity producto);
 
     List<ProductoEntity> getProductos();

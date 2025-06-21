@@ -88,6 +88,43 @@ public class ProductoServiceImpl implements ProductoService{
         return productoRepository.save(producto);
     }
 
+    @Override
+    public ProductoEntity updateProductoAndImage(ProductoEntity producto, MultipartFile file) throws IOException {
+        // Validar y buscar la categoría por su ID
+        if (producto.getCategoria() != null && producto.getCategoria().getId() != null) {
+            CategoriaEntity categoria = categoriaRepository.findById(producto.getCategoria().getId())
+                    .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + producto.getCategoria().getId()));
+            producto.setCategoria(categoria);
+        } else {
+            throw new RuntimeException("Se debe proporcionar el id de la categoría");
+        }
+
+        // Obtener el producto existente por su ID
+        ProductoEntity productoExistente = productoRepository.findById(producto.getId())
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + producto.getId()));
+
+        // Eliminar imagen anterior si llega una nueva
+        if (file != null && !file.isEmpty()) {
+            if (productoExistente.getImage() != null) {
+                imageService.deleteImage(productoExistente.getImage());
+            }
+            Image nuevaImagen = imageService.uploadImage(file);
+            productoExistente.setImage(nuevaImagen);
+        }
+
+        // 👇 Actualizar los demás campos
+        productoExistente.setNombre(producto.getNombre());
+        productoExistente.setDescripcion(producto.getDescripcion());
+        productoExistente.setPrecio(producto.getPrecio());
+        productoExistente.setUnidadMedida(producto.getUnidadMedida());
+        productoExistente.setPerecedero(producto.getPerecedero());
+        productoExistente.setCategoria(producto.getCategoria());
+
+        // 👇 Guardar y retornar el producto actualizado
+        return productoRepository.save(productoExistente);
+    }
+
+
 
     @Override
     public ProductoEntity updateProducto(ProductoEntity producto) {
