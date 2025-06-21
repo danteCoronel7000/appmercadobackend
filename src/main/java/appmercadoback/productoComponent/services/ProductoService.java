@@ -1,5 +1,6 @@
 package appmercadoback.productoComponent.services;
 
+import appmercadoback.categoriaComponent.entitys.CategoriaEntity;
 import appmercadoback.productoComponent.entitys.ProductoEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,4 +34,6 @@ public interface ProductoService {
     void deleteProducto(ProductoEntity producto) throws IOException;
 
     ProductoEntity updateProductoImage(MultipartFile file, ProductoEntity producto) throws IOException;
+
+    List<ProductoEntity> buscarPorNombre(String nombre);
 }

@@ -1,5 +1,6 @@
 package appmercadoback.productoComponent.repositorys;
 
+import appmercadoback.categoriaComponent.entitys.CategoriaEntity;
 import appmercadoback.productoComponent.entitys.ProductoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -18,4 +19,5 @@ public interface ProductoRepository extends JpaRepository<ProductoEntity, Intege
     List<ProductoEntity> findByStockActualLessThan(Integer stockMinimo);
 
     List<ProductoEntity> findByFechaVencimientoBefore(java.util.Date fecha);
+
 }

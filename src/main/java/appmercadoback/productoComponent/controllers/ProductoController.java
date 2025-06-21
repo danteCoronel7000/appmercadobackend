@@ -1,6 +1,7 @@
 package appmercadoback.productoComponent.controllers;
 
 
+import appmercadoback.categoriaComponent.entitys.CategoriaEntity;
 import appmercadoback.productoComponent.entitys.ProductoEntity;
 import appmercadoback.productoComponent.services.ProductoService;
 import lombok.RequiredArgsConstructor;
@@ -138,5 +139,12 @@ public class ProductoController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+
+    @GetMapping("/buscar")
+    public ResponseEntity<List<ProductoEntity>> searchByName(@RequestParam String nombre){
+        List<ProductoEntity> resultado = productoService.buscarPorNombre(nombre);
+        return ResponseEntity.ok(resultado);
     }
 }

@@ -158,4 +158,9 @@ public class ProductoServiceImpl implements ProductoService{
         producto.setImage(newImage);
         return productoRepository.save(producto);
     }
+
+    @Override
+    public List<ProductoEntity> buscarPorNombre(String nombre) {
+        return productoRepository.findByNombreContainingIgnoreCase(nombre);
+    }
 }
