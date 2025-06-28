@@ -19,5 +19,6 @@ public interface ProductoRepository extends JpaRepository<ProductoEntity, Intege
     List<ProductoEntity> findByStockActualLessThan(Integer stockMinimo);
 
     List<ProductoEntity> findByFechaVencimientoBefore(java.util.Date fecha);
-
+    //retorna todos los productos pertenecientes a una categoria
+    List<ProductoEntity> findByCategoriaId(Integer categoriaId);
 }

@@ -2,9 +2,14 @@ package appmercadoback.categoriaComponent.services;
 
 import appmercadoback.categoriaComponent.entitys.CategoriaEntity;
 import appmercadoback.categoriaComponent.repository.CategoriaRepository;
+import appmercadoback.productoComponent.entitys.Image;
+import appmercadoback.productoComponent.services.ImageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,54 +20,88 @@ import java.util.Optional;
 public class CategoriaServiceImpl implements CategoriaService{
 
     private final CategoriaRepository categoriaRepository;
+    @Autowired
+    private ImageService imageService;
 
+    // Métodos para la gestión de categorías con imágenes en la nube (Cloudinary)
     @Override
-    public CategoriaEntity guardarCategoria(CategoriaEntity categoria) {
-        categoria.setProductos(new ArrayList<>()); // o new ArrayList<>()
+    public CategoriaEntity saveCategoria(CategoriaEntity categoria, MultipartFile file) throws IOException {
+        // 👇 Validar si se proporcionó nombre u otro campo obligatorio
+        if (categoria.getNombre() == null || categoria.getNombre().isBlank()) {
+            throw new RuntimeException("El nombre de la categoría es obligatorio");
+        }
+
+        // 👇 Si hay archivo, procesar la imagen
+        if (file != null && !file.isEmpty()) {
+            Image image = imageService.uploadImage(file);
+            categoria.setImage(image);
+        }
+
         return categoriaRepository.save(categoria);
     }
 
     @Override
-    public List<CategoriaEntity> obtenerTodas() {
+    public CategoriaEntity updateCategoriaAndImage(CategoriaEntity categoria, MultipartFile file) throws IOException {
+        // Obtener la categoría existente por su ID
+        CategoriaEntity categoriaExistente = categoriaRepository.findById(categoria.getId())
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + categoria.getId()));
+
+        // 👇 Si llega una nueva imagen, eliminamos la anterior
+        if (file != null && !file.isEmpty()) {
+            if (categoriaExistente.getImage() != null) {
+                imageService.deleteImage(categoriaExistente.getImage());
+            }
+            Image nuevaImagen = imageService.uploadImage(file);
+            categoriaExistente.setImage(nuevaImagen);
+        }
+
+        // 👇 Actualizar los demás campos
+        categoriaExistente.setNombre(categoria.getNombre());
+        categoriaExistente.setDescripcion(categoria.getDescripcion());
+
+        return categoriaRepository.save(categoriaExistente);
+    }
+
+    @Override
+    public CategoriaEntity updateCategoria(CategoriaEntity categoria) {
+        return categoriaRepository.save(categoria);
+    }
+
+    @Override
+    public List<CategoriaEntity> getCategorias() {
         return categoriaRepository.findAll();
     }
 
     @Override
-    public Optional<CategoriaEntity> obtenerPorId(Integer id) {
+    public Optional<CategoriaEntity> getCategoriaById(Integer id) {
         return categoriaRepository.findById(id);
     }
 
     @Override
-    public CategoriaEntity actualizarCategoria(Integer id, CategoriaEntity categoriaActualizada) {
-        return categoriaRepository.findById(id)
-                .map(categoria -> {
-                    categoria.setNombre(categoriaActualizada.getNombre());
-                    categoria.setDescripcion(categoriaActualizada.getDescripcion());
-                    return categoriaRepository.save(categoria);
-                })
-                .orElseThrow(() -> new RuntimeException("Categoría no encontrada con ID: " + id));
+    public void deleteCategoria(CategoriaEntity categoria) throws IOException {
+        if (categoria.getImage() != null) {
+            imageService.deleteImage(categoria.getImage());
+        }
+        categoriaRepository.deleteById(categoria.getId());
     }
 
-    public CategoriaEntity eliminarCategoriaYRetornar(Integer id) {
-        // Primero buscamos la categoría
-        CategoriaEntity categoria = categoriaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Categoría no encontrada con ID: " + id));
-
-        // Eliminamos la categoría
-        categoriaRepository.delete(categoria);
-
-        // Retornamos la categoría eliminada
-        return categoria;
+    @Override
+    public CategoriaEntity updateCategoriaImage(MultipartFile file, CategoriaEntity categoria) throws IOException {
+        if (categoria.getImage() != null) {
+            imageService.deleteImage(categoria.getImage());
+        }
+        Image newImage = imageService.uploadImage(file);
+        categoria.setImage(newImage);
+        return categoriaRepository.save(categoria);
     }
 
-    public void eliminarCategoria(Integer id) {
-        categoriaRepository.deleteById(id);
-    }
 
     @Override
     public List<CategoriaEntity> buscarPorNombre(String nombre) {
         return categoriaRepository.findByNombreContainingIgnoreCase(nombre);
     }
+
+
 
 
 }

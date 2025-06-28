@@ -1,9 +1,9 @@
 package appmercadoback.categoriaComponent.entitys;
 
 
+import appmercadoback.productoComponent.entitys.Image;
 import appmercadoback.productoComponent.entitys.ProductoEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,8 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "categoria")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoriaEntity {
@@ -28,4 +27,8 @@ public class CategoriaEntity {
     @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL)
     @JsonBackReference
     private List<ProductoEntity> productos;
+
+    @OneToOne
+    @JoinColumn(name = "imagen_id")
+    private Image image;
 }

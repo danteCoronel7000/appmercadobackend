@@ -1,6 +1,7 @@
 package appmercadoback.productoComponent.services;
 
 import appmercadoback.categoriaComponent.entitys.CategoriaEntity;
+import appmercadoback.productoComponent.dtos.ProductoDTO;
 import appmercadoback.productoComponent.entitys.ProductoEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,4 +37,8 @@ public interface ProductoService {
     ProductoEntity updateProductoImage(MultipartFile file, ProductoEntity producto) throws IOException;
 
     List<ProductoEntity> buscarPorNombre(String nombre);
+    //retorna todos los productos pertenecientes a una categoria
+    List<ProductoDTO> obtenerProductosPorCategoria(Integer categoriaId);
+    //obtener un producto por id
+    ProductoDTO obtenerProductoPorId(Integer id);
 }

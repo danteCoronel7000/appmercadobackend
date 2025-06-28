@@ -2,6 +2,7 @@ package appmercadoback.productoComponent.services;
 
 import appmercadoback.categoriaComponent.entitys.CategoriaEntity;
 import appmercadoback.categoriaComponent.repository.CategoriaRepository;
+import appmercadoback.productoComponent.dtos.ProductoDTO;
 import appmercadoback.productoComponent.entitys.ProductoEntity;
 import appmercadoback.productoComponent.entitys.Image;
 import appmercadoback.productoComponent.repositorys.ProductoRepository;
@@ -14,6 +15,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +23,7 @@ public class ProductoServiceImpl implements ProductoService{
 
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
+
     @Autowired
     private ImageService imageService;
 
@@ -162,5 +165,20 @@ public class ProductoServiceImpl implements ProductoService{
     @Override
     public List<ProductoEntity> buscarPorNombre(String nombre) {
         return productoRepository.findByNombreContainingIgnoreCase(nombre);
+    }
+
+    @Override
+    public List<ProductoDTO> obtenerProductosPorCategoria(Integer categoriaId) {
+        return productoRepository.findByCategoriaId(categoriaId)
+                .stream()
+                .map(ProductoDTO::new)
+                .collect(Collectors.toList());
+    }
+    //obtener un producto por id
+    @Override
+    public ProductoDTO obtenerProductoPorId(Integer id) {
+        return productoRepository.findById(id)
+                .map(ProductoDTO::new)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + id));
     }
 }

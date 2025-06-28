@@ -2,6 +2,7 @@ package appmercadoback.productoComponent.controllers;
 
 
 import appmercadoback.categoriaComponent.entitys.CategoriaEntity;
+import appmercadoback.productoComponent.dtos.ProductoDTO;
 import appmercadoback.productoComponent.entitys.ProductoEntity;
 import appmercadoback.productoComponent.services.ProductoService;
 import lombok.RequiredArgsConstructor;
@@ -116,13 +117,13 @@ public class ProductoController {
     }
 
     // Obtener todos los productos
-    @GetMapping
+    @GetMapping("/get/all")
     public ResponseEntity<List<ProductoEntity>> getAllProductos() {
         return new ResponseEntity<>(productoService.getProductos(), HttpStatus.OK);
     }
 
     // Obtener un producto por ID
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity<ProductoEntity> getProductoById(@PathVariable Integer id) {
         Optional<ProductoEntity> producto = productoService.getProductoById(id);
         return producto.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
@@ -142,9 +143,21 @@ public class ProductoController {
     }
 
 
-    @GetMapping("/buscar")
+    @GetMapping("/get/buscar")
     public ResponseEntity<List<ProductoEntity>> searchByName(@RequestParam String nombre){
         List<ProductoEntity> resultado = productoService.buscarPorNombre(nombre);
         return ResponseEntity.ok(resultado);
+    }
+    //retorna todos los productos pertenecientes a una categoria
+    @GetMapping("/get/categoria/{id}")
+    public ResponseEntity<List<ProductoDTO>> obtenerProductPorCategoria(@PathVariable Integer id) {
+        List<ProductoDTO> productos = productoService.obtenerProductosPorCategoria(id);
+        return ResponseEntity.ok(productos);
+    }
+    ////obtener un producto por id para el app movil
+    @GetMapping("/get/producto/{id}")
+    public ResponseEntity<ProductoDTO> obtenerProductoPorId(@PathVariable Integer id) {
+        ProductoDTO producto = productoService.obtenerProductoPorId(id);
+        return ResponseEntity.ok(producto);
     }
 }
