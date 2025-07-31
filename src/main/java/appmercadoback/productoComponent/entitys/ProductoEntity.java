@@ -32,6 +32,7 @@ public class ProductoEntity {
     private Float precio;
     private Boolean perecedero;
     private String unidadMedida;
+    private String medida;
     private Integer stockActual;
     private Integer stockMin;
 

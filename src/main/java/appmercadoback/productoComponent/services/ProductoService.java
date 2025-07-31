@@ -30,6 +30,8 @@ public interface ProductoService {
 
     List<ProductoEntity> getProductos();
 
+    List<ProductoDTO> getProductosDto();
+
     Optional<ProductoEntity> getProductoById(Integer id);
 
     void deleteProducto(ProductoEntity producto) throws IOException;

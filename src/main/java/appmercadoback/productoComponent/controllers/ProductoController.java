@@ -8,6 +8,7 @@ import appmercadoback.productoComponent.services.ProductoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +22,7 @@ import java.util.Optional;
 public class ProductoController {
 
     private final ProductoService productoService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     /*
     @PostMapping
@@ -70,6 +72,9 @@ public class ProductoController {
             @RequestPart(value = "file", required = false) MultipartFile file) {
         try {
             ProductoEntity savedProducto = productoService.saveProducto(producto, file);
+            Integer id = savedProducto.getId();
+            ProductoDTO productoDTO = productoService.obtenerProductoPorId(id);
+            messagingTemplate.convertAndSend("/topic/productos", productoDTO); //notificamos a los clientes fronEnd  del registro
             return new ResponseEntity<>(savedProducto, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace(); // 👈 MOSTRÁ EL ERROR EN CONSOLA
@@ -83,6 +88,11 @@ public class ProductoController {
             @RequestPart(value = "file", required = false) MultipartFile file) {
         try {
             ProductoEntity savedProducto = productoService.updateProductoAndImage(producto, file);
+
+            Integer id = savedProducto.getId();
+            ProductoDTO productoDTO = productoService.obtenerProductoPorId(id);
+            messagingTemplate.convertAndSend("/topic/productos", productoDTO);
+
             return new ResponseEntity<>(savedProducto, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace(); // 👈 MOSTRÁ EL ERROR EN CONSOLA
@@ -120,6 +130,11 @@ public class ProductoController {
     @GetMapping("/get/all")
     public ResponseEntity<List<ProductoEntity>> getAllProductos() {
         return new ResponseEntity<>(productoService.getProductos(), HttpStatus.OK);
+    }
+
+    @GetMapping("/get/all/dto")
+    public ResponseEntity<List<ProductoDTO>> getAllProductosDtoApp(){
+        return new ResponseEntity<>(productoService.getProductosDto(), HttpStatus.OK);
     }
 
     // Obtener un producto por ID

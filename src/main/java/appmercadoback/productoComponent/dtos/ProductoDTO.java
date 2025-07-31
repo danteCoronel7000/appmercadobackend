@@ -12,6 +12,7 @@ public class ProductoDTO {
     private Float precio;
     private Boolean perecedero;
     private String unidadMedida;
+    private String medida;
     private Integer stockActual;
     private Integer stockMin;
     private Date fechaVencimiento;
@@ -28,6 +29,7 @@ public class ProductoDTO {
         this.precio = producto.getPrecio();
         this.perecedero = producto.getPerecedero();
         this.unidadMedida = producto.getUnidadMedida();
+        this.medida  = producto.getMedida();
         this.stockActual = producto.getStockActual();
         this.stockMin = producto.getStockMin();
         this.fechaVencimiento = producto.getFechaVencimiento();

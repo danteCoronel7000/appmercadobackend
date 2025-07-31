@@ -119,6 +119,7 @@ public class ProductoServiceImpl implements ProductoService{
         productoExistente.setNombre(producto.getNombre());
         productoExistente.setDescripcion(producto.getDescripcion());
         productoExistente.setPrecio(producto.getPrecio());
+        productoExistente.setMedida(producto.getMedida());
         productoExistente.setUnidadMedida(producto.getUnidadMedida());
         productoExistente.setPerecedero(producto.getPerecedero());
         productoExistente.setCategoria(producto.getCategoria());
@@ -138,6 +139,7 @@ public class ProductoServiceImpl implements ProductoService{
     public List<ProductoEntity> getProductos() {
         return productoRepository.findAll();
     }
+
 
     @Override
     public Optional<ProductoEntity> getProductoById(Integer id) {
@@ -165,6 +167,15 @@ public class ProductoServiceImpl implements ProductoService{
     @Override
     public List<ProductoEntity> buscarPorNombre(String nombre) {
         return productoRepository.findByNombreContainingIgnoreCase(nombre);
+    }
+
+    //lista de productos con dto para la aplicacion movil
+    @Override
+    public List<ProductoDTO> getProductosDto() {
+        return productoRepository.findAll()
+                .stream()
+                .map(ProductoDTO::new)
+                .collect(Collectors.toList());
     }
 
     @Override
