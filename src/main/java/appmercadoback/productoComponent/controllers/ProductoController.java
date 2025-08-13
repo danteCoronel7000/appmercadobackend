@@ -163,6 +163,12 @@ public class ProductoController {
         List<ProductoEntity> resultado = productoService.buscarPorNombre(nombre);
         return ResponseEntity.ok(resultado);
     }
+
+    @GetMapping("/get/buscar/app")
+    public ResponseEntity<List<ProductoDTO>> searchByNameApp(@RequestParam String nombre){
+        List<ProductoDTO> resultado = productoService.buscarPorNombreApp(nombre);
+        return ResponseEntity.ok(resultado);
+    }
     //retorna todos los productos pertenecientes a una categoria
     @GetMapping("/get/categoria/{id}")
     public ResponseEntity<List<ProductoDTO>> obtenerProductPorCategoria(@PathVariable Integer id) {

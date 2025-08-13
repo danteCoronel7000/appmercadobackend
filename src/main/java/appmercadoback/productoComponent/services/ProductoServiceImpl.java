@@ -169,6 +169,14 @@ public class ProductoServiceImpl implements ProductoService{
         return productoRepository.findByNombreContainingIgnoreCase(nombre);
     }
 
+    @Override
+    public List<ProductoDTO> buscarPorNombreApp(String nombre) {
+        return productoRepository.findByNombreContainingIgnoreCase(nombre)
+                .stream()
+                .map(ProductoDTO::new)
+                .collect(Collectors.toList());
+    }
+
     //lista de productos con dto para la aplicacion movil
     @Override
     public List<ProductoDTO> getProductosDto() {

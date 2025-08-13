@@ -37,8 +37,10 @@ public interface ProductoService {
     void deleteProducto(ProductoEntity producto) throws IOException;
 
     ProductoEntity updateProductoImage(MultipartFile file, ProductoEntity producto) throws IOException;
-
+    //buscar para la aplicacion web
     List<ProductoEntity> buscarPorNombre(String nombre);
+    //buscar productos para la aplicacion movil
+    List<ProductoDTO> buscarPorNombreApp(String nombre);
     //retorna todos los productos pertenecientes a una categoria
     List<ProductoDTO> obtenerProductosPorCategoria(Integer categoriaId);
     //obtener un producto por id

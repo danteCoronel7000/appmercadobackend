@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .csrf(crf -> crf.disable())
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/api/authentication/**", "/api/categorias/get/**", "/api/productos/get/**", "/ws/**").permitAll()
+                        .requestMatchers("/api/authentication/**", "/api/categorias/get/**", "/api/productos/get/**", "/ws/**", "/api/get/social-login/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)

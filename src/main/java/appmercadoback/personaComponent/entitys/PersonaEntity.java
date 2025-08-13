@@ -10,7 +10,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class PersonaEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,6 +17,7 @@ public class PersonaEntity {
     private String nombre;
     private String apellidoPaterno;
     private String apellidoMaterno;
+    private String gmail;
     private String direccion;
     private String telefono;
     private String genero;
