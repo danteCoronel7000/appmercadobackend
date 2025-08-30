@@ -1,9 +1,19 @@
 package appmercadoback.categoriaComponent.controllers;
 
+import appmercadoback.categoriaComponent.DTOs.CategoriaDTO;
 import appmercadoback.categoriaComponent.entitys.CategoriaEntity;
+import appmercadoback.categoriaComponent.mappers.CategoriaMapper;
+import appmercadoback.categoriaComponent.repository.CategoriaRepository;
 import appmercadoback.categoriaComponent.services.CategoriaService;
+import appmercadoback.productoComponent.entitys.ProductoEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +28,8 @@ import java.util.Optional;
 public class CategoriaController {
 
     private final CategoriaService categoriaService;
+    @Autowired
+    private CategoriaRepository categoriaRepository;
 
 /*
     @PostMapping("/crear")
@@ -57,28 +69,50 @@ public class CategoriaController {
         return ResponseEntity.ok().build(); // Cambiado a 200 OK
     }
     */
+    //retorna las categorias padre
+@GetMapping("/principales")
+public ResponseEntity<List<CategoriaEntity>> getCategoriasPrincipales() {
+    try {
+        List<CategoriaEntity> categoriasPrincipales = categoriaService.getCategoriasPrincipales();
+        return new ResponseEntity<>(categoriasPrincipales, HttpStatus.OK);
+    } catch (Exception e) {
+        e.printStackTrace();
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+    @GetMapping("/get/by/{id}")
+    public ResponseEntity<CategoriaDTO> getCategoriaByIdUp(@PathVariable Integer id) {
+        CategoriaEntity entity = categoriaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+
+        return ResponseEntity.ok(CategoriaMapper.toDTO(entity));
+    }
+
     //metodos para categorias con imaganes en cloudinary
 // Guardar una categoría con imagen
-@PostMapping("save")
+@PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 public ResponseEntity<CategoriaEntity> saveCategoria(
         @RequestPart("categoria") CategoriaEntity categoria,
-        @RequestPart(value = "file", required = false) MultipartFile file) {
+        @RequestPart(value = "file", required = false) MultipartFile file,
+        @RequestParam(required = false) Integer parentId) {
     try {
-        CategoriaEntity savedCategoria = categoriaService.saveCategoria(categoria, file);
+        CategoriaEntity savedCategoria = categoriaService.saveCategoria(categoria, file, parentId);
         return new ResponseEntity<>(savedCategoria, HttpStatus.OK);
     } catch (Exception e) {
-        e.printStackTrace(); // 👈 MOSTRÁ EL ERROR EN CONSOLA
+        e.printStackTrace();
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }
 
+
     // Actualizar una categoría con imagen
-    @PutMapping("update")
+    @PutMapping("/update")
     public ResponseEntity<CategoriaEntity> updateCategoriaAndImage(
             @RequestPart("categoria") CategoriaEntity categoria,
-            @RequestPart(value = "file", required = false) MultipartFile file) {
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            @RequestParam(required = false) Integer parentId) {
         try {
-            CategoriaEntity updatedCategoria = categoriaService.updateCategoriaAndImage(categoria, file);
+            CategoriaEntity updatedCategoria = categoriaService.updateCategoriaAndImage(categoria, file, parentId);
             return new ResponseEntity<>(updatedCategoria, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -123,6 +157,26 @@ public ResponseEntity<CategoriaEntity> saveCategoria(
         Optional<CategoriaEntity> categoria = categoriaService.getCategoriaById(id);
         return categoria.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    //obtener categorias con paginacion
+    @GetMapping("/get/paginado")
+    public ResponseEntity<Page<CategoriaEntity>> getAllCategoriasPaginado(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
+    ) {
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                sortDir.equalsIgnoreCase("desc") ?
+                        Sort.by(sortBy).descending() :
+                        Sort.by(sortBy).ascending()
+        );
+
+        Page<CategoriaEntity> productos = categoriaService.getCategoriasPaginados(pageable);
+        return new ResponseEntity<>(productos, HttpStatus.OK);
     }
 
     // Eliminar una categoría por ID

@@ -1,11 +1,16 @@
 package appmercadoback.productoComponent.controllers;
 
-
-import appmercadoback.categoriaComponent.entitys.CategoriaEntity;
+import appmercadoback.clienteComponent.entitys.ClienteEntity;
+import appmercadoback.clienteComponent.repositorys.ClienteRepository;
+import appmercadoback.productoComponent.dtos.JsonDto;
 import appmercadoback.productoComponent.dtos.ProductoDTO;
 import appmercadoback.productoComponent.entitys.ProductoEntity;
 import appmercadoback.productoComponent.services.ProductoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -22,7 +27,30 @@ import java.util.Optional;
 public class ProductoController {
 
     private final ProductoService productoService;
+    private final ClienteRepository clienteRepository;
     private final SimpMessagingTemplate messagingTemplate;
+
+    //endPoint que retorna la lista personalizada de productos para cada cliente. busca el cliente por id
+    @GetMapping("/get/list/client/{id}")
+    public  ResponseEntity<List<ProductoDTO>>listProdPreferidosOfClient(@PathVariable Long id){
+        return new ResponseEntity<>(productoService.listProductPreferidosOfClient(id), HttpStatus.OK);
+    }
+
+    //endPoint que retorna la lista personalizada de productos para cada cliente. busca el cliente por correo
+    @PostMapping("/get/list/client/correo")
+    public ResponseEntity<?> ListProdPrefOfClient(@RequestBody JsonDto jsonDto) {
+        ClienteEntity cliente = clienteRepository.obtenerClientePorCorreo(jsonDto.getValue());
+
+        if (cliente == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No existe cliente con el correo: " + jsonDto.getValue());
+        }
+
+        return ResponseEntity.ok(
+                productoService.listProductPreferidosOfClient(cliente.getId())
+        );
+    }
+
 
     /*
     @PostMapping
@@ -130,6 +158,25 @@ public class ProductoController {
     @GetMapping("/get/all")
     public ResponseEntity<List<ProductoEntity>> getAllProductos() {
         return new ResponseEntity<>(productoService.getProductos(), HttpStatus.OK);
+    }
+    //obtener productos con paginacion
+    @GetMapping("/get/paginado")
+    public ResponseEntity<Page<ProductoEntity>> getAllProductosPaginado(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
+    ) {
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                sortDir.equalsIgnoreCase("desc") ?
+                        Sort.by(sortBy).descending() :
+                        Sort.by(sortBy).ascending()
+        );
+
+        Page<ProductoEntity> productos = productoService.getProductosPaginados(pageable);
+        return new ResponseEntity<>(productos, HttpStatus.OK);
     }
 
     @GetMapping("/get/all/dto")

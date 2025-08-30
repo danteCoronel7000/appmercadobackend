@@ -1,4 +1,5 @@
 package appmercadoback.personaComponent.entitys;
+import appmercadoback.clienteComponent.entitys.ClienteEntity;
 import appmercadoback.productoComponent.entitys.Image;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,6 +22,9 @@ public class PersonaEntity {
     private String direccion;
     private String telefono;
     private String genero;
+
+    @OneToOne(mappedBy = "persona", cascade = CascadeType.ALL)
+    private ClienteEntity cliente;
 
     @OneToOne
     @JoinColumn(name = "imagen_id")

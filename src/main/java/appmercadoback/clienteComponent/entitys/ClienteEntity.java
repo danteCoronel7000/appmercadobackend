@@ -19,9 +19,6 @@ public class ClienteEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String correo;
-    private String telefono;
-
     @Column(name = "referencia_direccion")
     private String referenciaDireccion;
 
@@ -31,7 +28,7 @@ public class ClienteEntity {
     @Column(name = "dia_preferido_entrega")
     private String diaPreferidoDeEntrega; // 👈 Aquí está el nuevo campo
 
-    @ManyToOne
-    @JoinColumn(name = "persona_id")
+    @OneToOne
+    @JoinColumn(name = "persona_id", referencedColumnName = "id") // relación 1:1
     private PersonaEntity persona;
 }

@@ -1,8 +1,9 @@
 package appmercadoback.productoComponent.services;
 
-import appmercadoback.categoriaComponent.entitys.CategoriaEntity;
 import appmercadoback.productoComponent.dtos.ProductoDTO;
 import appmercadoback.productoComponent.entitys.ProductoEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -45,4 +46,8 @@ public interface ProductoService {
     List<ProductoDTO> obtenerProductosPorCategoria(Integer categoriaId);
     //obtener un producto por id
     ProductoDTO obtenerProductoPorId(Integer id);
+    //retorna la lista personalizada de productos para cada cliente
+        List<ProductoDTO> listProductPreferidosOfClient(Long id);
+        //retorna lista de productos paginado
+    Page<ProductoEntity> getProductosPaginados(Pageable pageable);
 }

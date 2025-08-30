@@ -34,8 +34,6 @@ public class ClienteServiceImpl implements ClienteService {
     public ClienteEntity actualizar(Long id, ClienteEntity actualizado) {
         return clienteRepository.findById(id)
                 .map(cliente -> {
-                    cliente.setCorreo(actualizado.getCorreo());
-                    cliente.setTelefono(actualizado.getTelefono());
                     cliente.setReferenciaDireccion(actualizado.getReferenciaDireccion());
                     cliente.setFrecuenciaCompra(actualizado.getFrecuenciaCompra());
                     cliente.setDiaPreferidoDeEntrega(actualizado.getDiaPreferidoDeEntrega());

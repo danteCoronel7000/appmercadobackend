@@ -3,9 +3,12 @@ package appmercadoback.categoriaComponent.services;
 import appmercadoback.categoriaComponent.entitys.CategoriaEntity;
 import appmercadoback.categoriaComponent.repository.CategoriaRepository;
 import appmercadoback.productoComponent.entitys.Image;
+import appmercadoback.productoComponent.entitys.ProductoEntity;
 import appmercadoback.productoComponent.services.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,10 +28,16 @@ public class CategoriaServiceImpl implements CategoriaService{
 
     // Métodos para la gestión de categorías con imágenes en la nube (Cloudinary)
     @Override
-    public CategoriaEntity saveCategoria(CategoriaEntity categoria, MultipartFile file) throws IOException {
+    public CategoriaEntity saveCategoria(CategoriaEntity categoria, MultipartFile file, Integer parentId) throws IOException {
         // 👇 Validar si se proporcionó nombre u otro campo obligatorio
         if (categoria.getNombre() == null || categoria.getNombre().isBlank()) {
             throw new RuntimeException("El nombre de la categoría es obligatorio");
+        }
+
+        if (parentId != null) {
+            CategoriaEntity parent = categoriaRepository.findById(parentId)
+                    .orElseThrow(() -> new RuntimeException("Categoría padre no encontrada con id: " + parentId));
+            categoria.setParent(parent);
         }
 
         // 👇 Si hay archivo, procesar la imagen
@@ -41,7 +50,7 @@ public class CategoriaServiceImpl implements CategoriaService{
     }
 
     @Override
-    public CategoriaEntity updateCategoriaAndImage(CategoriaEntity categoria, MultipartFile file) throws IOException {
+    public CategoriaEntity updateCategoriaAndImage(CategoriaEntity categoria, MultipartFile file, Integer parentId) throws IOException {
         // Obtener la categoría existente por su ID
         CategoriaEntity categoriaExistente = categoriaRepository.findById(categoria.getId())
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada con id: " + categoria.getId()));
@@ -53,6 +62,12 @@ public class CategoriaServiceImpl implements CategoriaService{
             }
             Image nuevaImagen = imageService.uploadImage(file);
             categoriaExistente.setImage(nuevaImagen);
+        }
+
+        if (parentId != null) {
+            CategoriaEntity parent = categoriaRepository.findById(parentId)
+                    .orElseThrow(() -> new RuntimeException("Categoría padre no encontrada con id: " + parentId));
+            categoriaExistente.setParent(parent);
         }
 
         // 👇 Actualizar los demás campos
@@ -101,7 +116,16 @@ public class CategoriaServiceImpl implements CategoriaService{
         return categoriaRepository.findByNombreContainingIgnoreCase(nombre);
     }
 
+    @Override
+    public List<CategoriaEntity> getCategoriasPrincipales() {
+        return categoriaRepository.findCategoriasPrincipalesSeguro();
+    }
 
+    // En tu servicio
+    @Override
+    public Page<CategoriaEntity> getCategoriasPaginados(Pageable pageable) {
+        return categoriaRepository.findAll(pageable);
+    }
 
 
 }

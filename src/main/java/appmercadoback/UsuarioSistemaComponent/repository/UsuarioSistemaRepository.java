@@ -7,4 +7,7 @@ import java.util.Optional;
 
 public interface UsuarioSistemaRepository extends JpaRepository<UsuarioSistemaEntity, Long> {
     Optional<UsuarioSistemaEntity> findByName(String name);
+
+    Optional<UsuarioSistemaEntity> findByPersona_Gmail(String gmail);
+
 }

@@ -24,7 +24,7 @@ public class UsuarioSistemaEntity {
     private String password;
     private String estado;
     private String role;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "persona_id")
     private PersonaEntity persona;
 }
