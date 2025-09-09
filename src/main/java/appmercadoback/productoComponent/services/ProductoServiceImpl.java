@@ -3,6 +3,7 @@ package appmercadoback.productoComponent.services;
 import appmercadoback.categoriaComponent.entitys.CategoriaEntity;
 import appmercadoback.categoriaComponent.repository.CategoriaRepository;
 import appmercadoback.productoComponent.dtos.ProductoDTO;
+import appmercadoback.productoComponent.dtos.ProductoDtoForWeb;
 import appmercadoback.productoComponent.entitys.ProductoEntity;
 import appmercadoback.productoComponent.entitys.Image;
 import appmercadoback.productoComponent.repositorys.ProductoRepository;
@@ -183,10 +184,12 @@ public class ProductoServiceImpl implements ProductoService{
     //lista de productos con dto para la aplicacion movil
     @Override
     public List<ProductoDTO> getProductosDto() {
-        return productoRepository.findAll()
-                .stream()
+        return productoRepository.findAll()// Obtiene todos los productos de la base de datos usando el repositorio
+                .stream()// Convierte la lista en un Stream para poder aplicar operaciones funcionales
+                // Transforma cada objeto Producto en un objeto ProductoDTO usando su constructor
+                // ProductoDTO::new es una referencia al constructor de ProductoDTO
                 .map(ProductoDTO::new)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());// Recolecta todos los elementos del stream y los convierte en una List
     }
 
     @Override
@@ -196,11 +199,28 @@ public class ProductoServiceImpl implements ProductoService{
                 .map(ProductoDTO::new)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<ProductoDtoForWeb> getAllProductosPagDto() {
+        return productoRepository.findAll()
+                .stream()
+                .map(ProductoDtoForWeb::new)
+                .collect(Collectors.toList());
+    }
+
     //obtener un producto por id
     @Override
     public ProductoDTO obtenerProductoPorId(Integer id) {
         return productoRepository.findById(id)
                 .map(ProductoDTO::new)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + id));
+    }
+
+    //obtener un producto por id
+    @Override
+    public ProductoDtoForWeb obtenerProductoPorIdForWS(Integer id) {
+        return productoRepository.findById(id)
+                .map(ProductoDtoForWeb::new)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + id));
     }
 
@@ -258,8 +278,34 @@ public class ProductoServiceImpl implements ProductoService{
     }
 
     // En tu servicio
-    public Page<ProductoEntity> getProductosPaginados(Pageable pageable) {
-        return productoRepository.findAll(pageable);
+    public Page<ProductoDtoForWeb> getProductosPaginados(Pageable pageable) {
+        Page<ProductoEntity> pageEntities = productoRepository.findAll(pageable);
+
+        return pageEntities.map(entity -> {
+            // Aquí puedes agregar lógica de mapeo más compleja
+            ProductoDtoForWeb dto = new ProductoDtoForWeb();
+
+            // Mapeo de todos los campos
+            dto.setId(entity.getId());
+            dto.setNombre(entity.getNombre());
+            dto.setDescripcion(entity.getDescripcion());
+            dto.setPrecio(entity.getPrecio());
+            dto.setPerecedero(entity.getPerecedero());
+            dto.setUnidadMedida(entity.getUnidadMedida());
+            dto.setPresentacion(entity.getPresentacion());
+            dto.setMedida(entity.getMedida());
+            dto.setStockActual(entity.getStockActual());
+            dto.setStockMin(entity.getStockMin());
+            dto.setFechaVencimiento(entity.getFechaVencimiento());
+            dto.setPopularidad(entity.getPopularidad());
+            dto.setEtiquetas(entity.getEtiquetas());
+
+            // Campos que dependen de relaciones (con validación null)
+            dto.setCategoriaNombre(entity.getCategoria() != null ? entity.getCategoria().getNombre() : null);
+            dto.setIdCategoria(entity.getCategoria() != null ? entity.getCategoria().getId() : null);
+            dto.setImageUrl(entity.getImage() != null ? entity.getImage().getImageUrl() : null);
+        return dto;
+        });
     }
 
 }

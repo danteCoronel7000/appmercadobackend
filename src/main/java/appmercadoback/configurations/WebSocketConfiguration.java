@@ -9,6 +9,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 //activamos todo lo necesario para usar STOMP/WebSocket
+
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
 
     // Esta parte configura el "broker" de mensajes (como si fuera una radio de canales)
@@ -17,7 +18,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
         config.enableSimpleBroker("/topic");
         // Lo anterior permite a los clientes suscribirse a "/topic/..."
         config.setApplicationDestinationPrefixes("/app");
-        // Todo mensaje enviado desde el cliente con destino "/app/..." se enruta al servidor
+        //Todo mensaje enviado desde el cliente con destino "/app/..." se enruta al servidor
     }
 
     @Override

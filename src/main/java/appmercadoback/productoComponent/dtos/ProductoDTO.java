@@ -16,6 +16,7 @@ public class ProductoDTO {
     private Float precio;
     private Boolean perecedero;
     private String unidadMedida;
+    private String presentacion;
     private String medida;
     private Integer stockActual;
     private Integer stockMin;

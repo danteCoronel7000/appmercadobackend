@@ -4,6 +4,7 @@ import appmercadoback.clienteComponent.entitys.ClienteEntity;
 import appmercadoback.clienteComponent.repositorys.ClienteRepository;
 import appmercadoback.productoComponent.dtos.JsonDto;
 import appmercadoback.productoComponent.dtos.ProductoDTO;
+import appmercadoback.productoComponent.dtos.ProductoDtoForWeb;
 import appmercadoback.productoComponent.entitys.ProductoEntity;
 import appmercadoback.productoComponent.services.ProductoService;
 import lombok.RequiredArgsConstructor;
@@ -94,7 +95,7 @@ public class ProductoController {
 */
     //endpoint para manejar los productos con imagenes
     // Guardar un producto con imagen
-    @PostMapping("save")
+    @PostMapping("/save")
     public ResponseEntity<ProductoEntity> saveProducto(
             @RequestPart("producto") ProductoEntity producto,
             @RequestPart(value = "file", required = false) MultipartFile file) {
@@ -102,8 +103,25 @@ public class ProductoController {
             ProductoEntity savedProducto = productoService.saveProducto(producto, file);
             Integer id = savedProducto.getId();
             ProductoDTO productoDTO = productoService.obtenerProductoPorId(id);
+            ProductoDtoForWeb productoDtoForWeb = productoService.obtenerProductoPorIdForWS(id);
             messagingTemplate.convertAndSend("/topic/productos", productoDTO); //notificamos a los clientes fronEnd  del registro
             return new ResponseEntity<>(savedProducto, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace(); // 👈 MOSTRÁ EL ERROR EN CONSOLA
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+    //save and return productoDtoForWeb for app web
+    @PostMapping("/save/return/ws")
+    public ResponseEntity<ProductoDtoForWeb> saveProductoAndRetPdFW(
+            @RequestPart("producto") ProductoEntity producto,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+        try {
+            ProductoEntity savedProducto = productoService.saveProducto(producto, file);
+            Integer id = savedProducto.getId();
+            ProductoDtoForWeb productoDtoForWeb = productoService.obtenerProductoPorIdForWS(id);
+            messagingTemplate.convertAndSend("/topic/productos", productoDtoForWeb); //notificamos a los clientes fronEnd  del registro
+            return new ResponseEntity<>(productoDtoForWeb, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace(); // 👈 MOSTRÁ EL ERROR EN CONSOLA
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -159,9 +177,9 @@ public class ProductoController {
     public ResponseEntity<List<ProductoEntity>> getAllProductos() {
         return new ResponseEntity<>(productoService.getProductos(), HttpStatus.OK);
     }
-    //obtener productos con paginacion
+    //obtener productos con paginacion para la aplicacion web
     @GetMapping("/get/paginado")
-    public ResponseEntity<Page<ProductoEntity>> getAllProductosPaginado(
+    public ResponseEntity<Page<ProductoDtoForWeb>> getAllProductosPaginado(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
@@ -175,7 +193,7 @@ public class ProductoController {
                         Sort.by(sortBy).ascending()
         );
 
-        Page<ProductoEntity> productos = productoService.getProductosPaginados(pageable);
+        Page<ProductoDtoForWeb> productos = productoService.getProductosPaginados(pageable);
         return new ResponseEntity<>(productos, HttpStatus.OK);
     }
 

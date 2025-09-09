@@ -33,14 +33,12 @@ public class ProductoEntity {
     private Boolean perecedero;
     private String unidadMedida;
     private String medida;
+    private String presentacion;
     private Integer stockActual;
     private Integer stockMin;
-
     @Temporal(TemporalType.DATE)
     private Date fechaVencimiento;
-
     private Integer popularidad;
-
     private String etiquetas;
 
     @ManyToOne(fetch = FetchType.EAGER)
