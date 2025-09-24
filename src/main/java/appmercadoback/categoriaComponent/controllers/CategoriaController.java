@@ -1,6 +1,7 @@
 package appmercadoback.categoriaComponent.controllers;
 
 import appmercadoback.categoriaComponent.DTOs.CategoriaDTO;
+import appmercadoback.categoriaComponent.DTOs.CategoriaDtoWeb;
 import appmercadoback.categoriaComponent.entitys.CategoriaEntity;
 import appmercadoback.categoriaComponent.mappers.CategoriaMapper;
 import appmercadoback.categoriaComponent.repository.CategoriaRepository;
@@ -151,6 +152,11 @@ public ResponseEntity<CategoriaEntity> saveCategoria(
         return new ResponseEntity<>(categoriaService.getCategorias(), HttpStatus.OK);
     }
 
+    @GetMapping("/get/dto/web")
+    public ResponseEntity<List<CategoriaDtoWeb>> getAllCategoriasDtoWeb() {
+        return new ResponseEntity<>(categoriaService.getCategoriasDtoWeb(), HttpStatus.OK);
+    }
+
     // Obtener una categoría por ID
     @GetMapping("/get/{id}")
     public ResponseEntity<CategoriaEntity> getCategoriaById(@PathVariable Integer id) {
@@ -177,6 +183,26 @@ public ResponseEntity<CategoriaEntity> saveCategoria(
 
         Page<CategoriaEntity> productos = categoriaService.getCategoriasPaginados(pageable);
         return new ResponseEntity<>(productos, HttpStatus.OK);
+    }
+
+    //obtener categorias con paginacion con dto
+    @GetMapping("/get/paginado/dto")
+    public ResponseEntity<Page<CategoriaDtoWeb>> getAllCategoriasPaginadoDto(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
+    ) {
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                sortDir.equalsIgnoreCase("desc") ?
+                        Sort.by(sortBy).descending() :
+                        Sort.by(sortBy).ascending()
+        );
+
+        Page<CategoriaDtoWeb> categorias = categoriaService.getCategoriasPaginadosDto(pageable);
+        return new ResponseEntity<>(categorias, HttpStatus.OK);
     }
 
     // Eliminar una categoría por ID

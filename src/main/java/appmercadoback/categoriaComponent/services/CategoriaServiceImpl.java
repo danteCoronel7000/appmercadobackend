@@ -1,5 +1,6 @@
 package appmercadoback.categoriaComponent.services;
 
+import appmercadoback.categoriaComponent.DTOs.CategoriaDtoWeb;
 import appmercadoback.categoriaComponent.entitys.CategoriaEntity;
 import appmercadoback.categoriaComponent.repository.CategoriaRepository;
 import appmercadoback.productoComponent.entitys.Image;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -88,6 +90,14 @@ public class CategoriaServiceImpl implements CategoriaService{
     }
 
     @Override
+    public List<CategoriaDtoWeb> getCategoriasDtoWeb() {
+        return categoriaRepository.findAll()
+                .stream()
+                .map(CategoriaDtoWeb::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Optional<CategoriaEntity> getCategoriaById(Integer id) {
         return categoriaRepository.findById(id);
     }
@@ -125,6 +135,13 @@ public class CategoriaServiceImpl implements CategoriaService{
     @Override
     public Page<CategoriaEntity> getCategoriasPaginados(Pageable pageable) {
         return categoriaRepository.findAll(pageable);
+    }
+
+
+    @Override
+    public Page<CategoriaDtoWeb> getCategoriasPaginadosDto(Pageable pageable) {
+        Page<CategoriaEntity> pageEntities = categoriaRepository.findAll(pageable);
+        return pageEntities.map(CategoriaDtoWeb::new);
     }
 
 

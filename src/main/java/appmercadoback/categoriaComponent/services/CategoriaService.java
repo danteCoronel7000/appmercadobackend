@@ -1,5 +1,6 @@
 package appmercadoback.categoriaComponent.services;
 
+import appmercadoback.categoriaComponent.DTOs.CategoriaDtoWeb;
 import appmercadoback.categoriaComponent.entitys.CategoriaEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +32,8 @@ public interface CategoriaService {
     CategoriaEntity updateCategoria(CategoriaEntity categoria);
 
     List<CategoriaEntity> getCategorias();
+    //obtener todas las cateogrias con dto
+    List<CategoriaDtoWeb> getCategoriasDtoWeb();
 
     Optional<CategoriaEntity> getCategoriaById(Integer id);
 
@@ -44,4 +47,6 @@ public interface CategoriaService {
     List<CategoriaEntity> getCategoriasPrincipales();
 
     Page<CategoriaEntity> getCategoriasPaginados(Pageable pageable);
+
+    Page<CategoriaDtoWeb> getCategoriasPaginadosDto(Pageable pageable);
 }
